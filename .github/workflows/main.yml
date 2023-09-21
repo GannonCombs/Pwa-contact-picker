@@ -11,8 +11,13 @@ jobs:
     steps:
     - name: Check if push is allowed at this time
       run: |
-        CURRENT_HOUR=$(date +'%H')
-        if [[ $CURRENT_HOUR -ge 9 && $CURRENT_HOUR -le 22 ]]; then
-          echo "Push is not allowed between 09:00 and 22:00"
+        CURRENT_HOUR_UTC=$(date +'%H')
+        # Convert from UTC to CST (UTC-6)
+        CURRENT_HOUR_CST=$((CURRENT_HOUR_UTC - 6))
+        if [ $CURRENT_HOUR_CST -lt 0 ]; then
+          CURRENT_HOUR_CST=$((CURRENT_HOUR_CST + 24))
+        fi
+        if [[ $CURRENT_HOUR_CST -ge 9 && $CURRENT_HOUR_CST -le 22 ]]; then
+          echo "Push is not allowed between 09:00 and 22:00 CST"
           exit 1
         fi
